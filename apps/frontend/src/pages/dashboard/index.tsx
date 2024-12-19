@@ -22,8 +22,9 @@ import {
   PaginationState
 } from '@tanstack/react-table'
 
-import { ArrowUpDown, Search } from 'lucide-react'
+import { ArrowUpDown, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { CreateEvent } from './components/create-event'
 
 type Event = {
   id: number
@@ -87,6 +88,7 @@ export function Dashboard() {
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
   const [data, setData] = useState<Event[]>([])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [openCreateEventDialog, setOpenCreateEventDialog] = useState(false)
 
   const columnHelper = createColumnHelper<Event>()
 
@@ -187,21 +189,34 @@ export function Dashboard() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <TextField
-        placeholder="Search"
-        slotProps={{
-          input: {
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search size={16} />
-              </InputAdornment>
-            )
-          }
-        }}
-        size="small"
-        value={globalFilter}
-        onChange={e => setGlobalFilter(e.target.value)}
-      />
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <TextField
+          sx={{ flex: 1 }}
+          placeholder="Search"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search size={16} />
+                </InputAdornment>
+              )
+            }
+          }}
+          size="small"
+          value={globalFilter}
+          onChange={e => setGlobalFilter(e.target.value)}
+        />
+        <Button
+          size="small"
+          variant="outlined"
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+          onClick={() => setOpenCreateEventDialog(true)}
+        >
+          <Plus size={16} />
+          Create Event
+        </Button>
+        <CreateEvent open={openCreateEventDialog} onClose={() => setOpenCreateEventDialog(false)} />
+      </Box>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
