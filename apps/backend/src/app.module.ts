@@ -6,7 +6,7 @@ import { EventsModule } from './events/events.module'
 import { UsersModule } from './users/users.module'
 import { ConfigModule } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
-import { AuthGuard } from './auth/auth.guard'
+import { AuthGuard } from './guards/auth.guard'
 import { PrismaService } from './prisma.service'
 
 @Module({

@@ -3,6 +3,9 @@ import type { Event, Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma.service'
 import { RequestContext } from 'src/types/token'
 import * as bcrypt from 'bcrypt'
+import { join } from 'path'
+import { existsSync } from 'fs'
+import { unlink } from 'fs/promises'
 
 @Injectable()
 export class EventsService {
@@ -71,5 +74,16 @@ export class EventsService {
 
   async count(where?: Prisma.EventWhereInput): Promise<number> {
     return this.prisma.event.count({ where })
+  }
+
+  async deleteUploadedFile(filename: string) {
+    try {
+      const filePath = join(process.cwd(), 'uploads', filename)
+      if (existsSync(filePath)) {
+        await unlink(filePath)
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 }
