@@ -49,7 +49,7 @@ Build a simple event management app
    2. The table should has filter, sort and search feature ✅
 4. **Create event**:
    1. User can create new events by providing details such as Event Name, Start Date, End Date & Location. ✅
-   2. User can upload an event poster thumbnail.
+   2. User can upload an event poster thumbnail. ✅
    3. Newly created events are automatically set with a status of "Ongoing".✅
 5. **Update event**:
    1. User can edit event details and change the uploaded thumbnail.✅/
@@ -63,3 +63,13 @@ Build a simple event management app
    1. Events are presented in a thumbnail gallery format for easy browsing, with the event poster thumbnail image.✅
 2. **Select event**:
    1. Users can click on individual event to view the event detail✅
+
+last thing to update:
+
+1. patch and create event change to multipart form data
+2. add class validator to entity
+3. image preview in frontend
+
+nice to have:
+
+1. add refresh token
