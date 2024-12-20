@@ -1,5 +1,6 @@
 import { isAxiosError } from 'axios'
 import api from '../lib/api'
+import { EventsResponse, UpdateEventInput } from '../schema/event'
 
 export async function createEvent(createEventInput: {
   name: string
@@ -14,36 +15,31 @@ export async function createEvent(createEventInput: {
   }
 }
 
-export async function updateEvent(updateEventInput: {
-  id: number
-  name: string
-  startDate: Date
-  endDate: Date
-  location: string
-  status: 'ONGOING' | 'COMPLETED'
-}) {
+export async function updateEvent(id: number, updateEventInput: UpdateEventInput) {
   try {
-    return await api.patch(`/events/${updateEventInput.id}`, updateEventInput)
+    return await api.patch(`/events/${id}`, updateEventInput)
   } catch (error) {
     if (isAxiosError(error)) throw Error(error.response?.data.message)
     throw Error('An error occurred')
   }
 }
 
-export async function getEvents() {
-  try {
-    return await api.get('/events')
-  } catch (error) {
-    if (isAxiosError(error)) throw Error(error.response?.data.message)
-    throw Error('An error occurred')
-  }
+interface GetEventsParams {
+  skip?: number
+  take?: number
 }
 
-export async function deleteEvent(id: number) {
-  try {
-    return await api.delete(`/events/${id}`)
-  } catch (error) {
-    if (isAxiosError(error)) throw Error(error.response?.data.message)
-    throw Error('An error occurred')
-  }
+export const getEvents = async ({
+  skip = 0,
+  take = 10
+}: GetEventsParams): Promise<EventsResponse> => {
+  const response = await api.get<EventsResponse>('/events', {
+    params: { skip, take }
+  })
+  return response.data
+}
+
+export async function deleteEvent(id: number, password: string) {
+  const res = await api.delete(`/events/${id}`, { data: { password } })
+  return res.data
 }

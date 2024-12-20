@@ -3,17 +3,17 @@ import { format } from 'date-fns'
 import { Calendar, CheckCircle, Clock, MapPin, User } from 'lucide-react'
 import { Event } from '../../schema/event'
 
-interface EventDialogProps {
+type EventDialogProps = {
   event: Event | null
   open: boolean
-  onClose: () => void
+  handleClose: () => void
 }
 
-export function EventDialog({ event, open, onClose }: EventDialogProps) {
+export function EventDialog({ event, open, handleClose }: EventDialogProps) {
   if (!event) return null
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth color="primary">
       <DialogTitle>{event.name}</DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 2 }}>

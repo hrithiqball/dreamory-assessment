@@ -6,7 +6,11 @@ import { Event } from '../../schema/event'
 import { EventDialog } from './EventDialog'
 
 export function Events() {
-  const { data: events, isLoading, error } = useQuery({ queryKey: ['events'], queryFn: getEvents })
+  const {
+    data: events,
+    isLoading,
+    error
+  } = useQuery({ queryKey: ['events'], queryFn: () => getEvents({}) })
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 
   if (isLoading) return <div>Loading...</div>
@@ -15,9 +19,9 @@ export function Events() {
   return (
     <Box sx={{ width: '100%', padding: '16px' }}>
       <Grid container spacing={2}>
-        {events?.data.map((event: Event) => (
+        {events?.events.map(event => (
           <Grid
-            size={4}
+            size={3}
             key={event.id}
             sx={{
               display: 'flex',
@@ -39,13 +43,13 @@ export function Events() {
             </Card>
           </Grid>
         ))}
-        {events?.data.length === 0 && <div>No events found</div>}
+        {events?.events.length === 0 && <div>No events found</div>}
       </Grid>
 
       <EventDialog
         event={selectedEvent}
         open={Boolean(selectedEvent)}
-        onClose={() => setSelectedEvent(null)}
+        handleClose={() => setSelectedEvent(null)}
       />
     </Box>
   )

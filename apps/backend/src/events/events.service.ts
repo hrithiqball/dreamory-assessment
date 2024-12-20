@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import type { Event, Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma.service'
 import { RequestContext } from 'src/types/token'
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class EventsService {
@@ -52,9 +53,23 @@ export class EventsService {
     })
   }
 
-  deleteEvent(where: Prisma.EventWhereUniqueInput): Promise<Event> {
-    return this.prisma.event.delete({
-      where
+  async deleteEvent(
+    ctx: RequestContext,
+    where: Prisma.EventWhereUniqueInput,
+    password: string
+  ): Promise<Event> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: ctx.user.sub }
     })
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new UnauthorizedException('Invalid password')
+    }
+
+    return this.prisma.event.delete({ where })
+  }
+
+  async count(where?: Prisma.EventWhereInput): Promise<number> {
+    return this.prisma.event.count({ where })
   }
 }

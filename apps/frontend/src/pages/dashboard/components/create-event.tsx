@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -62,33 +63,38 @@ export function CreateEvent(props: CreateEventProps) {
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle fontSize={18}>Create Event</DialogTitle>
-      <DialogContent>
-        <FormControl sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <FormInputText
-            size="small"
-            name="name"
-            control={control}
-            placeholder="Name"
-            type="text"
-          />
-          <FormDatePicker control={control} name="startDate" label="Start Date" />
-          <FormDatePicker control={control} name="endDate" label="End Date" />
-          <FormInputText
-            size="small"
-            name="location"
-            control={control}
-            placeholder="Location"
-            type="text"
-          />
-          <FormInputText
-            size="small"
-            name="posterUrl"
-            control={control}
-            placeholder="Poster URL"
-            type="text"
-          />
-        </FormControl>
-      </DialogContent>
+      <Box>
+        <DialogContent>
+          <FormControl sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <FormInputText
+              size="small"
+              name="name"
+              control={control}
+              placeholder="Name"
+              label="Name"
+              type="text"
+            />
+            <FormDatePicker control={control} name="startDate" label="Start Date" />
+            <FormDatePicker control={control} name="endDate" label="End Date" />
+            <FormInputText
+              size="small"
+              name="location"
+              control={control}
+              placeholder="Location"
+              label="Location"
+              type="text"
+            />
+            <FormInputText
+              size="small"
+              name="posterUrl"
+              control={control}
+              placeholder="Poster URL"
+              label="Poster URL"
+              type="text"
+            />
+          </FormControl>
+        </DialogContent>
+      </Box>
       <DialogActions>
         <Button size="small" variant="outlined" color="secondary" onClick={handleClose}>
           Cancel

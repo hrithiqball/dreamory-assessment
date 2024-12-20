@@ -10,14 +10,22 @@ export const CreateEventInputSchema = z.object({
 
 export type CreateEventInput = z.infer<typeof CreateEventInputSchema>
 
-export const UpdateEventInputSchema = z
-  .object({
-    id: z.number(),
-    status: z.enum(['ONGOING', 'COMPLETED'])
-  })
-  .merge(CreateEventInputSchema)
+export const UpdateEventInputSchema = z.object({
+  name: z.string().min(2).optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+  location: z.string().min(2).optional(),
+  posterUrl: z.string().min(2).optional(),
+  status: z.enum(['ONGOING', 'COMPLETED']).optional()
+})
 
 export type UpdateEventInput = z.infer<typeof UpdateEventInputSchema>
+
+export const DeleteEventSchema = z.object({
+  password: z.string().min(1, 'Password is required')
+})
+
+export type DeleteEventInput = z.infer<typeof DeleteEventSchema>
 
 export const EventSchema = z.object({
   id: z.number(),
@@ -37,3 +45,8 @@ export const EventSchema = z.object({
 })
 
 export type Event = z.infer<typeof EventSchema>
+
+export type EventsResponse = {
+  events: Event[]
+  total: number
+}

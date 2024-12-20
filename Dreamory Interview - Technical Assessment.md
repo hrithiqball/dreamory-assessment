@@ -26,14 +26,14 @@ Build a simple event management app
 2. Use **NestJS**✅
 3. Use **Prisma and Postgres** as the database solution✅
 4. Organize code in a MVP structure, incorporating Model, Controller & Service layers.✅
-5. Use JWT authentication with AuthGuard to secure backend APIs
+5. Use JWT authentication with AuthGuard to secure backend APIs✅
 6. Encrypt user passwords before storing them✅
 
 ### Bonus
 
 1. Validate input from the frontend using class-validator or an equivalent library. ✅ (zod)
 2. Implement a refresh token mechanism
-3. Implement pagination to limit results per page.
+3. Implement pagination to limit results per page.✅
 4. Enhance the frontend application with responsive design techniques, ensuring that the UI adapts seamlessly to different screen sizes.
 
 ### App Features
@@ -52,14 +52,14 @@ Build a simple event management app
    2. User can upload an event poster thumbnail.
    3. Newly created events are automatically set with a status of "Ongoing".✅
 5. **Update event**:
-   1. User can edit event details and change the uploaded thumbnail.
-   2. A dropdown menu allow users to switch the event status between "Ongoing" and "Completed".
+   1. User can edit event details and change the uploaded thumbnail.✅/
+   2. A dropdown menu allow users to switch the event status between "Ongoing" and "Completed".✅
 6. **Delete event**:
-   1. Users can delete events, with password validation required for confirmation.
+   1. Users can delete events, with password validation required for confirmation.✅
 
 #### User Portal
 
 1. **List events**:
    1. Events are presented in a thumbnail gallery format for easy browsing, with the event poster thumbnail image.✅
 2. **Select event**:
-   1. Users can click on individual event to view the event detail
+   1. Users can click on individual event to view the event detail✅

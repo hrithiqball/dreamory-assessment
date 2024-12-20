@@ -5,4 +5,5 @@ export type FormProps = {
   name: string
   control: Control<FieldValues | any>
   error?: FieldError | undefined
+  rules?: Record<string, unknown>
 }

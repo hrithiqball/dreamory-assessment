@@ -1,7 +1,10 @@
 import {
   Box,
   Button,
+  Chip,
+  IconButton,
   InputAdornment,
+  Pagination,
   Paper,
   Table,
   TableBody,
@@ -11,90 +14,54 @@ import {
   TableRow,
   TextField
 } from '@mui/material'
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  flexRender,
   createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  PaginationState,
   SortingState,
-  PaginationState
+  useReactTable
 } from '@tanstack/react-table'
-
-import { ArrowUpDown, Plus, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { CreateEvent } from './components/create-event'
-import { useMutation } from '@tanstack/react-query'
-import api from '../../lib/api'
+import { ArrowUpDown, Edit, Eye, Plus, Search, Trash } from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
-
-type Event = {
-  id: number
-  name: string
-  startDate: Date
-  endDate: Date
-  location: string
-  status: 'Ongoing' | 'Completed'
-  poster: string
-}
-const eventData: Event[] = [
-  {
-    id: 1,
-    name: 'Event 1',
-    startDate: new Date(),
-    endDate: new Date(),
-    location: 'Location 1',
-    status: 'Ongoing',
-    poster: 'Poster 1'
-  },
-  {
-    id: 2,
-    name: 'Event 2',
-    startDate: new Date(),
-    endDate: new Date(),
-    location: 'Location 2',
-    status: 'Completed',
-    poster: 'Poster 2'
-  },
-  {
-    id: 3,
-    name: 'Event 3',
-    startDate: new Date(),
-    endDate: new Date(),
-    location: 'Location 3',
-    status: 'Ongoing',
-    poster: 'Poster 3'
-  },
-  {
-    id: 4,
-    name: 'Event 4',
-    startDate: new Date(),
-    endDate: new Date(),
-    location: 'Location 4',
-    status: 'Completed',
-    poster: 'Poster 4'
-  },
-  {
-    id: 5,
-    name: 'Event 5',
-    startDate: new Date(),
-    endDate: new Date(),
-    location: 'Location 5',
-    status: 'Ongoing',
-    poster: 'Poster 5'
-  }
-]
+import { getEvents } from '../../api/events'
+import api from '../../lib/api'
+import { Event } from '../../schema/event'
+import { CreateEvent } from './components/create-event'
+import { EventDialog } from '../../pages/events/EventDialog'
+import { EditEvent } from './components/edit-event'
+import { DeleteEvent } from './components/delete-event'
 
 export function Dashboard() {
   const navigate = useNavigate()
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
-  const [data, setData] = useState<Event[]>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [openCreateEventDialog, setOpenCreateEventDialog] = useState(false)
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [openViewDialog, setOpenViewDialog] = useState(false)
+  const [openEditDialog, setOpenEditDialog] = useState(false)
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+
+  const {
+    data: eventData,
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ['events', pagination.pageIndex, pagination.pageSize],
+    queryFn: () =>
+      getEvents({
+        skip: pagination.pageIndex * pagination.pageSize,
+        take: pagination.pageSize
+      }),
+    placeholderData: keepPreviousData
+  })
 
   const logOutMutation = useMutation({
     mutationFn: async () => {
@@ -110,19 +77,7 @@ export function Dashboard() {
 
   const columnHelper = createColumnHelper<Event>()
 
-  useEffect(() => {
-    setData(eventData)
-
-    return () => {
-      setData([])
-    }
-  }, [])
-
   const columns = [
-    columnHelper.accessor('id', {
-      header: 'ID',
-      cell: info => info.getValue()
-    }),
     columnHelper.accessor('name', {
       header: ({ column }) => {
         return (
@@ -155,7 +110,7 @@ export function Dashboard() {
         )
       },
       cell: info => (
-        <Box sx={{ display: 'flex', gap: 1 }}>{info.getValue().toLocaleDateString()}</Box>
+        <Box sx={{ display: 'flex', gap: 1 }}>{new Date(info.getValue()).toLocaleDateString()}</Box>
       )
     }),
     columnHelper.accessor('endDate', {
@@ -173,7 +128,7 @@ export function Dashboard() {
         )
       },
       cell: info => (
-        <Box sx={{ display: 'flex', gap: 1 }}>{info.getValue().toLocaleDateString()}</Box>
+        <Box sx={{ display: 'flex', gap: 1 }}>{new Date(info.getValue()).toLocaleDateString()}</Box>
       )
     }),
     columnHelper.accessor('location', {
@@ -182,12 +137,51 @@ export function Dashboard() {
     }),
     columnHelper.accessor('status', {
       header: 'Status',
-      cell: info => info.getValue()
+      cell: info => {
+        return info.getValue() === 'ONGOING' ? (
+          <Chip label="Ongoing" color="warning" size="small" />
+        ) : (
+          <Chip label="Completed" color="success" size="small" />
+        )
+      }
+    }),
+    columnHelper.display({
+      id: 'actions',
+      cell: info => (
+        <Box sx={{ textAlign: 'right' }}>
+          <IconButton
+            onClick={() => {
+              setSelectedEvent(info.row.original)
+              setOpenViewDialog(true)
+            }}
+          >
+            <Eye size={16} />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              setSelectedEvent(info.row.original)
+              setOpenEditDialog(true)
+            }}
+          >
+            <Edit size={16} />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              setSelectedEvent(info.row.original)
+              setOpenDeleteDialog(true)
+            }}
+          >
+            <Trash size={16} />
+          </IconButton>
+        </Box>
+      )
     })
   ]
+
   const table = useReactTable({
-    data,
+    data: eventData?.events ?? [],
     columns,
+    pageCount: Math.ceil((eventData?.total ?? 0) / pagination.pageSize),
     state: {
       sorting,
       globalFilter,
@@ -202,8 +196,12 @@ export function Dashboard() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
-    onPaginationChange: setPagination
+    onPaginationChange: setPagination,
+    manualPagination: true
   })
+
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error: {error.message}</div>
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -276,6 +274,43 @@ export function Dashboard() {
 
         {table.getRowModel().rows.length === 0 && <div style={{ padding: 16 }}>No data found</div>}
       </TableContainer>
+
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Pagination
+          count={table.getPageCount()}
+          page={pagination.pageIndex + 1}
+          onChange={(_, page) => {
+            setPagination(prev => ({
+              ...prev,
+              pageIndex: page - 1
+            }))
+          }}
+        />
+      </Box>
+      <EventDialog
+        event={selectedEvent}
+        open={openViewDialog}
+        handleClose={() => {
+          setOpenViewDialog(false)
+          setSelectedEvent(null)
+        }}
+      />
+      <EditEvent
+        event={selectedEvent}
+        open={openEditDialog}
+        handleClose={() => {
+          setOpenEditDialog(false)
+          setSelectedEvent(null)
+        }}
+      />
+      <DeleteEvent
+        event={selectedEvent}
+        open={openDeleteDialog}
+        onClose={() => {
+          setOpenDeleteDialog(false)
+          setSelectedEvent(null)
+        }}
+      />
     </Box>
   )
 }
