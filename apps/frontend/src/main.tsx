@@ -5,16 +5,23 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import { Router } from './router.tsx'
 import { theme } from './theme.tsx'
+import { Toaster } from 'sonner'
 
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import './index.css'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter children={<Router />} />
+        <QueryClientProvider client={queryClient}>
+          <CssBaseline />
+          <BrowserRouter children={<Router />} />
+          <Toaster richColors />
+        </QueryClientProvider>
       </ThemeProvider>
     </LocalizationProvider>
   </StrictMode>

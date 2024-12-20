@@ -5,6 +5,7 @@ import { BaseLayout } from './layout/base'
 import { Register } from './pages/auth/register'
 import { Dashboard } from './pages/dashboard'
 import { AdminLayout } from './layout/admin'
+import { Events } from './pages/events'
 
 export function Router() {
   return (
@@ -15,6 +16,7 @@ export function Router() {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>
+        <Route path="events" element={<Events />} />
       </Route>
       <Route path="admin" element={<AdminLayout />}>
         <Route index path="dashboard" element={<Dashboard />} />

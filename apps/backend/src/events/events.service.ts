@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import type { Event, Prisma } from '@prisma/client'
 import { PrismaService } from 'src/prisma.service'
+import { RequestContext } from 'src/types/token'
 
 @Injectable()
 export class EventsService {
@@ -25,11 +26,18 @@ export class EventsService {
       take,
       cursor,
       where,
-      orderBy
+      orderBy,
+      include: {
+        createdBy: {
+          select: {
+            name: true
+          }
+        }
+      }
     })
   }
 
-  async createEvent(data: Prisma.EventCreateInput): Promise<Event> {
+  async createEvent(ctx: RequestContext, data: Prisma.EventCreateInput): Promise<Event> {
     return this.prisma.event.create({ data })
   }
 

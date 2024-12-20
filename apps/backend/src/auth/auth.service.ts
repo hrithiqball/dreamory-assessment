@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
-import { verify, hash } from 'argon2'
+import { JwtService } from '@nestjs/jwt'
+import { User } from '@prisma/client'
+import { compare, hash } from 'bcrypt'
 import { UsersService } from 'src/users/users.service'
 import { LoginDto } from './dto/login.dto'
-import { JwtService } from '@nestjs/jwt'
 import { RegisterDto } from './dto/register.dto'
 
 @Injectable()
@@ -16,24 +17,45 @@ export class AuthService {
     const { email, password } = loginDto
 
     const user = await this.userService.user({ email })
-    if (!user || (await verify(password, user.password)))
+
+    if (!user || !(await compare(password, user.password)))
       throw new HttpException('Invalid email or password', HttpStatus.UNAUTHORIZED)
 
-    const payload = { email: user.email, sub: user.id }
+    return { access_token: this.createToken(user) }
+  }
 
-    return {
-      access_token: this.jwtService.sign(payload)
-    }
+  async logout() {
+    return { message: 'Logout successful' }
   }
 
   async register(registerDto: RegisterDto) {
     const { email, password, name } = registerDto
 
-    const user = await this.userService.user({ email })
-    if (user) throw new HttpException('User already exists', HttpStatus.BAD_REQUEST)
+    const userExist = await this.userService.user({ email })
+    if (userExist) throw new HttpException('User already exists', HttpStatus.BAD_REQUEST)
 
-    const hashedPassword = await hash(password)
+    const hashedPassword = await hash(password, 10)
 
-    return this.userService.createUser({ email, password: hashedPassword, name })
+    const user = await this.userService.createUser({ email, password: hashedPassword, name })
+    return { access_token: this.createToken(user) }
+  }
+
+  async refresh(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken)
+      const user = await this.userService.user({ id: payload.sub })
+
+      if (!user) throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED)
+
+      return { access_token: this.createToken(user) }
+    } catch (e) {
+      console.error(e)
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED)
+    }
+  }
+
+  createToken = (user: User) => {
+    const payload = { email: user.email, sub: user.id }
+    return this.jwtService.sign(payload)
   }
 }

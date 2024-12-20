@@ -25,6 +25,10 @@ import {
 import { ArrowUpDown, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { CreateEvent } from './components/create-event'
+import { useMutation } from '@tanstack/react-query'
+import api from '../../lib/api'
+import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 
 type Event = {
   id: number
@@ -84,11 +88,25 @@ const eventData: Event[] = [
 ]
 
 export function Dashboard() {
+  const navigate = useNavigate()
+
   const [sorting, setSorting] = useState<SortingState>([])
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
   const [data, setData] = useState<Event[]>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [openCreateEventDialog, setOpenCreateEventDialog] = useState(false)
+
+  const logOutMutation = useMutation({
+    mutationFn: async () => {
+      const res = await api.post('/auth/logout')
+      return { message: res.data.message }
+    },
+    onSuccess: res => {
+      toast.success(res.message)
+      localStorage.removeItem('access_token')
+      navigate('/auth/login')
+    }
+  })
 
   const columnHelper = createColumnHelper<Event>()
 
@@ -189,6 +207,17 @@ export function Dashboard() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Admin</span>
+        <Button
+          size="small"
+          variant="outlined"
+          color="secondary"
+          onClick={() => logOutMutation.mutate()}
+        >
+          Logout
+        </Button>
+      </Box>
       <Box sx={{ display: 'flex', gap: 2 }}>
         <TextField
           sx={{ flex: 1 }}
