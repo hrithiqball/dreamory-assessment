@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { getEvents } from '../../api/events'
 import { Event } from '../../schema/event'
 import { EventDialog } from './EventDialog'
+import { ImagePreview } from '../../components/image-preview'
+import { Link } from 'react-router'
 
 export function Events() {
   const {
@@ -17,7 +19,8 @@ export function Events() {
   if (error) return <div>Error: {error.message}</div>
 
   return (
-    <Box sx={{ width: '100%', padding: '16px' }}>
+    <Box sx={{ width: '100%', padding: 2 }}>
+      <Link to="/">Go Home</Link>
       <Grid container spacing={2}>
         {events?.events.map(event => (
           <Grid
@@ -31,10 +34,9 @@ export function Events() {
           >
             <Card sx={{ cursor: 'pointer' }} onClick={() => setSelectedEvent(event)}>
               <CardContent>
-                <img
-                  src="https://fr.ethnasia.com/cdn/shop/articles/sean-o-KMn4VEeEPR8-unsplash_edited.jpg?v=1621585619&width=1100"
-                  alt=""
-                  style={{ width: 'auto', height: '250px' }}
+                <ImagePreview
+                  path={event.posterUrl}
+                  styles={{ height: '250px', objectFit: 'contain' }}
                 />
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Box sx={{ typography: 'h6', mb: 1 }}>{event.name}</Box>

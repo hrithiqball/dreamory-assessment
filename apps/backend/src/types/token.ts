@@ -7,4 +7,5 @@ export type Payload = {
 
 export type RequestContext = {
   user: Payload
+  access_token: string
 }

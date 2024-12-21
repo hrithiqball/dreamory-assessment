@@ -3,13 +3,13 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
+import { Toaster } from 'sonner'
 import { Router } from './router.tsx'
 import { theme } from './theme.tsx'
-import { Toaster } from 'sonner'
 
 import { LocalizationProvider } from '@mui/x-date-pickers'
-import './index.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import './index.css'
 
 const queryClient = new QueryClient()
 

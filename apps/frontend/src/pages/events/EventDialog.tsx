@@ -1,7 +1,8 @@
-import { Box, Chip, Dialog, DialogContent, DialogTitle } from '@mui/material'
+import { Box, Chip, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material'
 import { format } from 'date-fns'
-import { Calendar, CheckCircle, Clock, MapPin, User } from 'lucide-react'
+import { Calendar, CheckCircle, Clock, MapPin, User, X } from 'lucide-react'
 import { Event } from '../../schema/event'
+import { ImagePreview } from '../../components/image-preview'
 
 type EventDialogProps = {
   event: Event | null
@@ -13,14 +14,25 @@ export function EventDialog({ event, open, handleClose }: EventDialogProps) {
   if (!event) return null
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth color="primary">
-      <DialogTitle>{event.name}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+      <DialogTitle
+        sx={{
+          bgcolor: 'primary.main',
+          color: 'primary.contrastText',
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}
+      >
+        <span>{event.name}</span>
+        <IconButton size="small" onClick={handleClose} sx={{ color: 'primary.contrastText' }}>
+          <X />
+        </IconButton>
+      </DialogTitle>
       <DialogContent>
-        <Box sx={{ mb: 2 }}>
-          <img
-            src="https://fr.ethnasia.com/cdn/shop/articles/sean-o-KMn4VEeEPR8-unsplash_edited.jpg?v=1621585619&width=1100"
-            alt=""
-            style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'cover' }}
+        <Box sx={{ my: 2 }}>
+          <ImagePreview
+            path={event.posterUrl}
+            styles={{ maxHeight: '400px', objectFit: 'contain' }}
           />
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>

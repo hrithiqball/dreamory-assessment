@@ -1,34 +1,34 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Card, CardActions, CardContent, CardHeader, FormControl } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
-import { FormInputText } from '../../components/form/form-input-text'
-import api from '../../lib/api'
-import { LoginSchema, Login as LoginType } from '../../schema/auth'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { AxiosError } from 'axios'
+import { login } from '../../api/auth'
+import { FormInputText } from '../../components/form/form-input-text'
+import { LoginInput, LoginSchema } from '../../schema/auth'
 
 export function Login() {
   const navigate = useNavigate()
-  const { control, handleSubmit } = useForm<LoginType>({
+  const { control, handleSubmit } = useForm<LoginInput>({
     resolver: zodResolver(LoginSchema)
   })
 
   const loginMutation = useMutation({
-    mutationFn: async (data: unknown) => {
-      const res = await api.post('/auth/login', data)
-      localStorage.setItem('access_token', res.data.access_token)
-    },
-    onSuccess: () => {
+    mutationFn: async (data: LoginInput) => await login(data),
+    onSuccess: (res: string) => {
+      localStorage.setItem('access_token', res)
       toast.success('Login successful')
       navigate('/admin/dashboard')
     },
-    onError: (err: AxiosError<{ message: string; statusCode: number }>) =>
-      toast.error(err.response?.data.message)
+    onError: err => {
+      if (isAxiosError(err)) toast.error(err.response?.data.message)
+      else toast.error('An error occurred')
+    }
   })
 
-  function onSubmit(data: unknown) {
+  function onSubmit(data: LoginInput) {
     loginMutation.mutate(data)
   }
 

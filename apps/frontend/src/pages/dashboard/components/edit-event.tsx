@@ -6,6 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   MenuItem
 } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -17,6 +18,9 @@ import { FormDatePicker } from '../../../components/form/form-date-picker'
 import { FormInputText } from '../../../components/form/form-input-text'
 import { Event, UpdateEventInput, UpdateEventInputSchema } from '../../../schema/event'
 import { FormSelect } from '../../../components/form/form-select'
+import { ImagePreview } from '../../../components/image-preview'
+import { FormImageInput } from '../../../components/form/form-image-input'
+import { X } from 'lucide-react'
 
 type EditEventProps = {
   event: Event | null
@@ -50,7 +54,17 @@ export function EditEvent({ event, open, handleClose }: EditEventProps) {
   }, [event, reset])
 
   const editEventMutation = useMutation({
-    mutationFn: async (data: UpdateEventInput) => await updateEvent(event?.id as number, data),
+    mutationFn: async (data: UpdateEventInput) => {
+      const formData = new FormData()
+      if (data.name) formData.append('name', data.name)
+      if (data.location) formData.append('location', data.location)
+      if (data.startDate) formData.append('startDate', data.startDate.toISOString())
+      if (data.endDate) formData.append('endDate', data.endDate.toISOString())
+      if (data.status) formData.append('status', data.status)
+      if (data.poster) formData.append('poster', data.poster)
+
+      await updateEvent(event?.id as number, formData)
+    },
     onSuccess: () => {
       toast.success('Event updated successfully')
       queryClient.invalidateQueries({ queryKey: ['events'] })
@@ -73,7 +87,19 @@ export function EditEvent({ event, open, handleClose }: EditEventProps) {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Edit Event</DialogTitle>
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          bgcolor: 'primary.main',
+          color: 'primary.contrastText'
+        }}
+      >
+        <span>Edit Event</span>
+        <IconButton size="small" onClick={handleClose} sx={{ color: 'primary.contrastText' }}>
+          <X size={16} />
+        </IconButton>
+      </DialogTitle>
       <Box>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <FormInputText name="name" control={control} label="Name" size="small" />
@@ -84,14 +110,16 @@ export function EditEvent({ event, open, handleClose }: EditEventProps) {
           </FormSelect>
           <FormDatePicker name="startDate" control={control} label="Start Date" />
           <FormDatePicker name="endDate" control={control} label="End Date" />
+          <ImagePreview path={event.posterUrl} />
+          <FormImageInput name="poster" control={control} />
         </DialogContent>
       </Box>
       <DialogActions>
-        <Button size="small" variant="outlined" color="secondary" onClick={handleClose}>
+        <Button size="small" variant="text" color="secondary" onClick={handleClose}>
           Cancel
         </Button>
         <Button size="small" variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
-          Create
+          Update
         </Button>
       </DialogActions>
     </Dialog>

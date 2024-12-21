@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Card, CardActions, CardContent, CardHeader } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
+import { toast } from 'sonner'
+import { register } from '../../api/auth'
 import { FormInputText } from '../../components/form/form-input-text'
-import api from '../../lib/api'
-import { Register as RegisterType, RegisterSchema } from '../../schema/auth'
+import { RegisterInput, RegisterSchema } from '../../schema/auth'
 
 export function Register() {
   const navigate = useNavigate()
@@ -13,19 +15,24 @@ export function Register() {
     handleSubmit,
     control,
     formState: { errors }
-  } = useForm<RegisterType>({
+  } = useForm<RegisterInput>({
     resolver: zodResolver(RegisterSchema)
   })
 
   const registerMutation = useMutation({
-    mutationFn: async (data: unknown) => {
-      const res = await api.post('/auth/register', data)
-      localStorage.setItem('access_token', res.data.access_token)
+    mutationFn: async (data: RegisterInput) => await register(data),
+    onSuccess: res => {
+      localStorage.setItem('access_token', res)
+      toast.success('Registration successful')
+      navigate('/admin/dashboard')
     },
-    onSuccess: () => navigate('/admin/dashboard')
+    onError: error => {
+      if (isAxiosError(error)) toast.error(error.response?.data.message)
+      else toast.error('An error occurred')
+    }
   })
 
-  function onSubmit(data: unknown) {
+  function onSubmit(data: RegisterInput) {
     registerMutation.mutate(data)
   }
 

@@ -206,10 +206,10 @@ export function Dashboard() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>Admin</span>
+        <span>Admin Portal</span>
         <Button
           size="small"
-          variant="outlined"
+          variant="text"
           color="secondary"
           onClick={() => logOutMutation.mutate()}
         >

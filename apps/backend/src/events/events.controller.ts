@@ -74,20 +74,23 @@ export class EventsController {
   async update(
     @Param('id') id: string,
     @Body() updateEventDto: UpdateEventDto,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file?: Express.Multer.File
   ) {
     const event = await this.eventsService.event({ id: +id })
     if (!event) throw new HttpException('Event not found', HttpStatus.NOT_FOUND)
+
+    const updateData = { ...updateEventDto }
 
     if (file) {
       if (event.posterUrl) {
         const oldFileName = event.posterUrl.split('/').pop()
         await this.eventsService.deleteUploadedFile(oldFileName)
       }
+      updateData.posterUrl = `uploads/${file.filename}`
     }
 
     return this.eventsService.updateEvent({
-      data: { ...updateEventDto, posterUrl: `uploads/${file.filename}` },
+      data: updateData,
       where: { id: +id }
     })
   }

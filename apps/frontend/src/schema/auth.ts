@@ -5,7 +5,7 @@ export const LoginSchema = z.object({
   password: z.string().min(6)
 })
 
-export type Login = z.infer<typeof LoginSchema>
+export type LoginInput = z.infer<typeof LoginSchema>
 
 export const RegisterSchema = z
   .object({
@@ -13,4 +13,4 @@ export const RegisterSchema = z
   })
   .merge(LoginSchema)
 
-export type Register = z.infer<typeof RegisterSchema>
+export type RegisterInput = z.infer<typeof RegisterSchema>

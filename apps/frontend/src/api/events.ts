@@ -1,13 +1,8 @@
 import { isAxiosError } from 'axios'
 import api from '../lib/api'
-import { EventsResponse, UpdateEventInput } from '../schema/event'
+import { EventsResponse } from '../schema/event'
 
-export async function createEvent(createEventInput: {
-  name: string
-  startDate: Date
-  endDate: Date
-  location: string
-}) {
+export async function createEvent(createEventInput: FormData) {
   try {
     return await api.post('/events', createEventInput)
   } catch (error) {
@@ -15,7 +10,7 @@ export async function createEvent(createEventInput: {
   }
 }
 
-export async function updateEvent(id: number, updateEventInput: UpdateEventInput) {
+export async function updateEvent(id: number, updateEventInput: FormData) {
   try {
     return await api.patch(`/events/${id}`, updateEventInput)
   } catch (error) {

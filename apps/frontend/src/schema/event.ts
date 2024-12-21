@@ -5,7 +5,7 @@ export const CreateEventInputSchema = z.object({
   startDate: z.date(),
   endDate: z.date(),
   location: z.string().min(2),
-  posterUrl: z.string().min(2)
+  poster: z.any()
 })
 
 export type CreateEventInput = z.infer<typeof CreateEventInputSchema>
@@ -15,8 +15,8 @@ export const UpdateEventInputSchema = z.object({
   startDate: z.date().optional(),
   endDate: z.date().optional(),
   location: z.string().min(2).optional(),
-  posterUrl: z.string().min(2).optional(),
-  status: z.enum(['ONGOING', 'COMPLETED']).optional()
+  status: z.enum(['ONGOING', 'COMPLETED']).optional(),
+  poster: z.any().optional()
 })
 
 export type UpdateEventInput = z.infer<typeof UpdateEventInputSchema>

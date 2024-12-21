@@ -32,7 +32,7 @@ Build a simple event management app
 ### Bonus
 
 1. Validate input from the frontend using class-validator or an equivalent library. ✅ (zod)
-2. Implement a refresh token mechanism
+2. Implement a refresh token mechanism ✅
 3. Implement pagination to limit results per page.✅
 4. Enhance the frontend application with responsive design techniques, ensuring that the UI adapts seamlessly to different screen sizes.
 
@@ -63,13 +63,3 @@ Build a simple event management app
    1. Events are presented in a thumbnail gallery format for easy browsing, with the event poster thumbnail image.✅
 2. **Select event**:
    1. Users can click on individual event to view the event detail✅
-
-last thing to update:
-
-1. patch and create event change to multipart form data
-2. add class validator to entity
-3. image preview in frontend
-
-nice to have:
-
-1. add refresh token

@@ -6,15 +6,18 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl
+  FormControl,
+  IconButton
 } from '@mui/material'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
+import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import { createEvent } from '../../../api/events'
 import { FormDatePicker } from '../../../components/form/form-date-picker'
+import { FormImageInput } from '../../../components/form/form-image-input'
 import { FormInputText } from '../../../components/form/form-input-text'
 import { CreateEventInput, CreateEventInputSchema } from '../../../schema/event'
 
@@ -28,12 +31,25 @@ export function CreateEvent(props: CreateEventProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const { control, handleSubmit, reset } = useForm<CreateEventInput>({
+  const { control, handleSubmit, reset, setError } = useForm<CreateEventInput>({
     resolver: zodResolver(CreateEventInputSchema)
   })
 
   const createEventMutation = useMutation({
-    mutationFn: async (data: CreateEventInput) => await createEvent(data),
+    mutationFn: async (data: CreateEventInput) => {
+      if (!data.poster) {
+        setError('poster', { message: 'Poster is required' })
+        throw new Error('Poster is required')
+      }
+
+      const formData = new FormData()
+      formData.append('name', data.name)
+      formData.append('startDate', data.startDate.toISOString())
+      formData.append('endDate', data.endDate.toISOString())
+      formData.append('location', data.location)
+      formData.append('poster', data.poster)
+      await createEvent(formData)
+    },
     onSuccess: () => {
       toast.success('Event created successfully')
       queryClient.invalidateQueries({ queryKey: ['events'] })
@@ -62,7 +78,19 @@ export function CreateEvent(props: CreateEventProps) {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle fontSize={18}>Create Event</DialogTitle>
+      <DialogTitle
+        sx={{
+          bgcolor: 'primary.main',
+          color: 'primary.contrastText',
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}
+      >
+        <span>Create Event</span>
+        <IconButton onClick={handleClose} sx={{ color: 'primary.contrastText' }}>
+          <X size={16} />
+        </IconButton>
+      </DialogTitle>
       <Box>
         <DialogContent>
           <FormControl sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -84,19 +112,12 @@ export function CreateEvent(props: CreateEventProps) {
               label="Location"
               type="text"
             />
-            <FormInputText
-              size="small"
-              name="posterUrl"
-              control={control}
-              placeholder="Poster URL"
-              label="Poster URL"
-              type="text"
-            />
+            <FormImageInput name="poster" control={control} />
           </FormControl>
         </DialogContent>
       </Box>
       <DialogActions>
-        <Button size="small" variant="outlined" color="secondary" onClick={handleClose}>
+        <Button size="small" variant="text" color="secondary" onClick={handleClose}>
           Cancel
         </Button>
         <Button size="small" variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
